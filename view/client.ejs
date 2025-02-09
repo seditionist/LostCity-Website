@@ -46,7 +46,7 @@
             display: block;
         }
 
-        .gameframe {
+        #gameframe {
             display: flex;
             flex-grow: 1;
             width: 100%;
@@ -95,6 +95,22 @@
                 hideNotification();
             }
         }
+
+        function sendSettings() {
+            let clientSettings = localStorage.getItem('clientSettings');
+            if (clientSettings) {
+                let iframe = document.getElementById('gameframe');
+                iframe.contentWindow.postMessage(clientSettings, '*');
+            }
+        }
+
+        window.onmessage = function(e) {
+            if (e.origin !== '<%= world.address %>') {
+                return;
+            }
+
+            localStorage.setItem('clientSettings', e.data);
+        }
     </script>
 </head>
 
@@ -122,7 +138,7 @@
                 </div>
             </div>
 
-            <iframe class="gameframe" src='<%= world.address %>/rs2.cgi?plugin=<%= method %>&world=<%= world.id %>&lowmem=<%= detail %>' allowfullscreen></iframe>
+            <iframe id="gameframe" onload="sendSettings()" src='<%= world.address %>/rs2.cgi?plugin=<%= method %>&world=<%= world.id %>&lowmem=<%= detail %>' allowfullscreen></iframe>
         </div>
     </center>
 
